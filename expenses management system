@@ -1,0 +1,154 @@
+# expenses-management-app
+console based expenses  management app by using python.
+#models file.....
+class category:
+    def setcatid(self,catid):
+        self.catid=catid
+    def setcatname(self,catname):
+        self.catname=catname
+    def getcatid(self):
+        return self.catid
+    def getcatname(self):
+        return self.catname
+class expense():
+    def setamount(self,amount):
+        self.amount=amount
+    def setremark(self,remark):
+        self.remark=remark
+    def setdate(self,date):
+        self.date=date
+    def setcategoryid(self,cid):
+        self.cid=cid
+    def getamount(self):
+        return self.amount
+    def getremark(self):
+        return self.remark
+    def getdate(self):
+        return self.date
+    def getcategoryid(self):
+        return self.cid  
+       
+   .....................................................................................
+   #app.py
+    
+from models import *
+class app:
+    li=[]
+    eli=[]
+    def startapp(self):
+        while True:
+            select=self.printoptions()
+            if select==1:
+                self.addcategory()
+                
+            if select==2:
+                self.catlist()
+            if select==3:
+                self.expenseslist()
+            if select==4:
+                self.reportcatwise()
+            if select==5:
+                self.reportmonthwise()
+            if select==6:
+                self.report_month_rangewise()
+            if select==7:
+                self.report_amountwise()
+                
+            elif select==8:
+                break
+    def printoptions(self):
+        print("1.add category")
+        print("2.category listing")
+        print("3.expense entry")
+        print("4.report catwise")
+        print("5.report month")
+        print("6.report monthrange")
+        print("7.report amount")
+        print("8.exit")
+        ch=int(input("enter your choice:"))
+        return ch
+    def addcategory(self):
+        catname=input("enter category name")
+        catid=int(input("enter category id"))
+        c=category()
+        c.setcatid(catid)
+        c.setcatname(catname)
+        app.li.append(c)
+        print("cat added")
+
+    def catlist(self):
+        print("*********available categories*******")
+        for i in app.li:
+            print(i.getcatid(),i.getcatname())
+
+    def expenseslist(self):
+        self.catlist()
+        catid=int(input("enter cat id"))
+        amount=float(input("enter amount"))
+        date=input("enter date(dd/mm/yyyy)")
+        remark=input("enter remark")
+        c=expense()
+        c.setcategoryid(catid)
+        c.setamount(amount)
+        c.setdate(date)
+        c.setremark(remark)
+        app.eli.append(c)
+        print("expenses added")
+        
+    def reportcatwise(self):
+        self.catlist()
+        cid=int(input("enter category id"))
+        for i in app.eli:
+            if i.getcategoryid()==cid:
+             print(i.getamount(),i.getdate(),i.getremark())
+    def reportmonthwise(self):
+        year=int(input("enter year"))
+        month=int(input("enter month"))
+        for i in app.eli:
+            dt=i.getdate()
+            dt2=dt.split("/")
+            if year==int(dt2[2]) and month==int(dt2[1]):
+                print(i.getamount(),i.getremark(),i.getdate())
+    def report_month_rangewise(self):
+        year=int(input("enter year"))
+        start_month=int(input("enter start month"))
+        end_month=int(input("enter end month"))
+        for i in app.eli:
+            dt=i.getdate()
+            dt2=dt.split("/")
+            if year==int(dt2[2])and int(dt2[1]) in range(start_month,end_month):
+                print(i.getamount(),i.getremark(),i.getdate())
+                
+        
+    def report_amountwise(self):
+        start_limit=int(input("enter start limit of amount"))
+        end_limit=int(input("enter end limit of amount"))
+        for i in app.eli:
+            amount=i.getamount()
+            if amount in range(start_limit,end_limit):
+                print(i.getamount(),i.getremark(),i.getdate())
+
+
+
+    
+obj=app()
+obj.startapp()
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
