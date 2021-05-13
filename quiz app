@@ -1,0 +1,179 @@
+# quiz_app
+console based quiz app using python and mysql.
+#query to create table in database
+create table user_profile(uid int primary key auto_increment,username varchar(30) unique, password varchar(50), name varchar(50),email varchar(70),role varchar(30));
+
+create table technology(tid int primary key auto_increment, tname varchar(50) unique);
+
+CREATE TABLE result(  `rid` int(11) NOT NULL AUTO_INCREMENT,
+`user_id` int(11) DEFAULT NULL,
+`tech_id` int(11) DEFAULT NULL,
+`marks` float DEFAULT NULL,
+`resdate` date DEFAULT NULL,
+`status` int(11) DEFAULT NULL,
+PRIMARY KEY (`rid`),
+KEY `user_id` (`user_id`),
+KEY `tech_id` (`tech_id`),
+CONSTRAINT `result_ibfk_1` FOREIGN KEY (`user_id`) REFERENCES `user_profile` (`uid`),
+CONSTRAINT `result_ibfk_2` FOREIGN KEY (`tech_id`) REFERENCES `technology` (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=LATIN1;
+
+
+CREATE TABLE question(
+`qid` int(11) NOT NULL AUTO_INCREMENT,
+`question` varchar(100) DEFAULT NULL,
+`opta` varchar(50) DEFAULT NULL,
+`optb` varchar(50) DEFAULT NULL,
+`optc` varchar(50) DEFAULT NULL,
+`optd` varchar(50) DEFAULT NULL,
+`correct` varchar(10) DEFAULT NULL,
+`tech_id` int(11) DEFAULT NULL,
+PRIMARY KEY (`qid`),
+UNIQUE KEY `question` (`question`),
+KEY `tech_id` (`tech_id`),
+CONSTRAINT `question_ibfk_1` FOREIGN KEY (`tech_id`) REFERENCES `technology` (`tid`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+
+
+INSERT INTO `user_profile` (`uid`, `username`, `password`, `name`, `email`, `role`) VALUES (1, 'admin123', '1234', 'Rakesh Bajpai', 'rakesh@gmail.com', 'admin');
+
+
+
+
+
+
+# database conectivity
+import pymysql
+mydb=pymysql.connect(host="localhost",port=3306,user="root",passwd="",database="quizapp")
+mycursor=mydb.cursor()
+#============================================================================
+
+from dbconfig import *
+import datetime
+def getTechId():
+    mycursor.execute("select * from technology")
+    tech_all=mycursor.fetchall()
+    for i in tech_all:
+        print(i[0],i[1])
+    tid=int(input("select technology: "))
+    return tid
+    
+def callAdmin():
+    while True:
+        print("1.Add student")
+        print("2.Add technology")
+        print("3.Add question")
+        print("4.search result")
+        print("5.Logout")
+        ch=int(input("Enter choice: "))
+        if ch==1:
+            un=input("enter username: ")
+            pwd=input("enter password: ")
+            nm=input("Enter name: ")
+            em=input("Enter email: ")
+            mycursor.execute("insert into user_profile(username,password,name,email,role)values('{}','{}','{}','{}','student')".format(un,pwd,nm,em))
+            mydb.commit()
+            print("student added")
+        if ch==2:
+            try:
+                tn=input("Enter technology name: ")
+                mycursor.execute("insert into technology(tname)values('{}')".format(tn))
+                mydb.commit()
+                print("technology added! ")
+            except:
+                print("Technology already exist! ")
+                
+        if ch==3:
+            tid=getTechId()
+            q=input("Enter question: ")
+            a=input("Enter Option A: ")
+            b=input("Enter Option B: ")
+            c=input("Enter Option C: ")
+            d=input("Enter Option D: ")
+            correct=input("Enter correct (A/B/C/D): ")
+            mycursor.execute("insert into question(question,opta,optb,optc,optd,correct,tech_id)values('{}','{}','{}','{}','{}','{}','{}')".format(q,a,b,c,d,correct,tid))
+            mydb.commit()
+            print("question added!")
+        if ch==4:
+            uid=int(input("Enter student id"))
+            mycursor.execute("select * from result where user_id={}".format(uid))
+            info=mycursor.fetchall()
+            for i in info:
+                print("=====================")
+                print("Marks obtained: ",i[3])
+                print("Date: ",i[4])
+                print("status",i[5])
+                print("========================")
+        if ch==5:
+            break
+def callStudent():
+    while True:
+        print("1.start test: ")
+        print("2.Results: ")
+        print("3.logout: ")
+        ch=int(input("Enter choice: "))
+        if ch==1:
+            tid=getTechId()
+            mycursor.execute("select * from question where tech_id={}".format(tid))
+            all_ques=mycursor.fetchall()
+            j=1
+            count=0
+            for i in all_ques:
+                print(j,i[1])
+                print("A.",i[2])
+                print("B.",i[3])
+                print("C.",i[4])
+                print("D.",i[5])
+                ans=input("Enter answer: ")
+                if ans==i[6]:
+                    count=count+1
+                j=j+1
+                print("Result: ",count,"/",len(all_ques))
+                per=(count/len(all_ques))*100
+                if per>=50:
+                    s=1
+                else:
+                    s=0
+                    
+                mycursor.execute("select * from user_profile")
+                uid_all=mycursor.fetchall()
+                for i in uid_all:
+                    print(i[0],i[3])
+                uid=int(input("select student id"))    
+                
+                date=datetime.date.today()
+                mycursor.execute("insert into result(user_id,tech_id,marks,resdate,status)values('{}','{}','{}','{}','{}')".format(uid,tid,per,date,s))
+                mydb.commit()
+                print("result added")
+                   
+
+        if ch==2:
+            uid=int(input("Enter student id"))
+            mycursor.execute("select * from result where user_id={}".format(uid))
+            info=mycursor.fetchall()
+            for i in info:
+                print("=====================")
+                print("Marks obtained: ",i[3])
+                print("Date: ",i[4])
+                print("status",i[5])
+                print("========================")
+            
+                    
+                    
+    
+                    
+            
+        if ch==3:
+            break
+un=input("Enter user name: ")
+pwd=input("Enter password: ")
+mycursor.execute("select * from user_profile where username='{}' and password='{}'".format(un,pwd))
+udata=mycursor.fetchone()
+if udata:
+    print("======welcome {}=======".format(udata[3]))
+    if udata[5]=='admin':
+        callAdmin()
+    elif udata[5]=='student':
+        callStudent()
+else:
+    print("invalid username or password ! ")
