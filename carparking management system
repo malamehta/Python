@@ -1,0 +1,235 @@
+#console based carparking management system using python and mysql database
+
+==================================================
+import pymysql
+mydb=pymysql.connect(host="localhost",port=3306,user="root",passwd="",database="carparking")
+mycursor=mydb.cursor()
+=======================================================
+
+from dbconfig import *
+from datetime import *
+def outgoing():
+    number=input("enter car number: ")
+    mycursor.execute("select * from arrival_details where carNumber='{}'".format(number))
+    data=mycursor.fetchall()
+    for i in data:
+        data1=i[1]
+        
+        
+        if i[0]==number:
+            time1=datetime.now()
+            mycursor.execute("insert into depature_detail(carNumber,depatureTime)values('{}','{}')".format(number,time1))
+            mydb.commit()
+            print(" depatured successfully!")
+        
+            mycursor.execute("select * from depature_detail where carNumber='{}'".format(number))
+            data2=mycursor.fetchall()
+            for j in data2:
+                data2=j[1]
+                
+                
+                        
+               
+            total_time=data2-data1
+            t=str(total_time)
+            tt=t.split(":")
+            
+            hr=int(tt[0])
+            
+            mi=int(tt[1])
+            
+            sec=int(tt[2])
+            
+            
+            amount=(hr*10)+(mi*0.16)+(sec*0.0083)
+            
+            
+            """mycursor.execute("insert into duration_amount(carNumber,duration,amount)values('{}','{}','{}')".format(number,total_time,amount))
+            mydb.commit()"""
+            mycursor.execute("update report set depatureTime='{}',duration='{}',amount='{}' where carNumber='{}'".format(data2,total_time,amount,number))
+            mydb.commit()
+            print("time and amount added successfully:")
+            print("")
+            print("=====Receipt=======")
+            print("")
+            print("car number: ",number)
+            print("Arrival time: ",data1)            
+            print("depature time: ",data2)
+            print("Total parked time:",total_time)
+            print("Total amount to be paid:",amount)
+            print("")
+            print("=====Thanks for taking our services==== ")
+            print("")
+            mycursor.execute("select * from arrival_details where carNumber='{}'".format(number))
+            data=mycursor.fetchall()
+            for i in data:
+                slot=i[2]
+            """mycursor.execute("Delete from slot_detail where slot='{}'".format(slot))
+            mydb.commit()"""
+            mycursor.execute("Delete from arrival_details where carNumber='{}'".format(number))
+            mydb.commit()
+            
+    else:
+        print("invalid car number")    
+                    
+                      
+
+
+def callAdmin():
+    while True:
+        print("1.add customer:")
+        print("2. inserting details of parking: ")
+    
+        print("3. show report: ")
+        print("4. search for particular record: ")
+        print("6.download record:")
+        print("5. logout: ")
+        ch=int(input("Enter choice"))
+        if ch==1:
+            uname=input("enter user name: ")
+            nm=input("enter name: ")
+            mycursor.execute("insert into user_profile(uname,name,role)values('{}','{}','customer')".format(uname,nm))
+            mydb.commit()
+            print("customer added! ")
+            
+            
+        if ch==2:
+            capacity=input("enter total capacity: ")
+            charge=float(input("input charges per hour:"))
+            mycursor.execute("insert into parking_details(capacity,chargesPerHour)values('{}','{}')".format(capacity,charge))
+            mydb.commit()
+            print("details added!")
+            
+         
+        if ch==3:
+            mycursor.execute("select * from report")
+            data=mycursor.fetchall()
+            
+            for i in data:
+                print("===========================================")
+                print("car number: ",i[1])
+                print("arrival time: ",i[2])
+                
+                print("depature time: ",i[3])
+                print("time Duration: ",i[4])
+                print("total paid amount:",i[5])
+                print("slot provided: ",i[6])
+                
+                
+                print("=============================================")
+            
+        if ch==4:
+            num=input("Enter car number ,you are looking for detail: ")
+            mycursor.execute("select * from report where carNumber='{}'".format(num))
+            data=mycursor.fetchall()
+            print(data)
+            for i in data:
+                print("==============================================")
+                print("car number: ",i[1])
+                print("arrival time: ",i[2])
+                print("depature time: ",i[3])
+                print("time Duration: ",i[4])
+                print("total paid amount:",i[5])
+                print("slot provided: ",i[6])
+                
+                
+                print("==============================================")
+        
+    
+            
+        if ch==5:
+            break
+def callCustomer():
+    while True:
+        print("1.view parking details: ")
+        print("2.arrival of vehicles: ")
+        print("3.depature: ")
+        print("4.logout: ")
+        ch=int(input("Enter choice: "))
+        if ch==1:
+            mycursor.execute("select * from parking_details")
+            data=mycursor.fetchall()
+            
+            print("====parking details=======")
+            print("")
+            for i in data:
+                print("Total capacity: ",i[0])
+                print("charges per hour: ",i[1])
+                print("")
+                print("===========================")
+                print("")
+        if ch==2:
+            li=[]
+            mycursor.execute("select* from arrival_details")
+            res=mycursor.fetchall()
+            
+            for i in res:
+                li.append(i[2])
+            print(li)
+            
+            print("available slot:",range(1,10),"Except these slot:",li)
+            
+            vehicle_num=input("Enter your vehicle number: ")
+            time= datetime.now()
+            slot=input("enter slot number")
+            if slot in li:
+                print("this slot is already reserved,chose next: ")
+            else:
+                """mycursor.execute("insert into slot_detail(carNumber,slot)values('{}','{}')".format(vehicle_num,slot))
+                mydb.commit()"""
+                mycursor.execute("insert into arrival_details(carNumber,arrivalTime,slot)values('{}','{}','{}')".format(vehicle_num,time,slot))
+                mydb.commit()
+                mycursor.execute("insert into report(carNumber,arrivalTime,slotId)values('{}','{}','{}')".format(vehicle_num,time,slot))
+                mydb.commit()
+            print("car parked successfully!")
+        if ch==3:
+            outgoing()
+                
+                               
+        if ch==4:
+            break
+        
+        
+print("1. admin:")
+print("2.customer for parking:")
+print("3.customer for depture:")
+ch=int(input("enter choice: "))
+if ch==1:
+    un=input("Enter username: ")
+    mycursor.execute("select * from user_profile where uname='{}'".format(un))
+    udata=mycursor.fetchone()
+    if udata:
+        print("=====welcome {}=======".format(udata[2]))
+        if udata[3]=='admin':
+            callAdmin()
+elif ch==2:
+    uname=input("enter user name: ")
+    nm=input("enter name: ")
+    mycursor.execute("select * from user_profile")
+    d=mycursor.fetchall()
+    for i in d:
+        if i[1]==uname and i[3]=='customer':
+            callCustomer()
+        
+            
+    mycursor.execute("insert into user_profile(uname,name,role)values('{}','{}','customer')".format(uname,nm))
+    mydb.commit()
+    print("customer added! ")
+    mycursor.execute("select * from user_profile where uname='{}'".format(uname))
+    udata=mycursor.fetchone()
+    if udata:
+        print("=====welcome {}=======".format(udata[2]))
+        if udata[3]=='customer':
+            callCustomer()
+elif ch==3:
+    un=input("Enter username: ")
+    mycursor.execute("select * from user_profile where uname='{}'".format(un))
+    udata=mycursor.fetchone()
+    if udata:
+        print("=====welcome {}=======".format(udata[2]))
+        if udata[3]=='customer':
+            outgoing()
+    else:
+        print("invalid username")
+    
+
