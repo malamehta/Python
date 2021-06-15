@@ -1,0 +1,91 @@
+tic-tac-toe game using tkinter
+
+from tkinter import *
+root=Tk()
+root.geometry("400x400")
+root.resizable(0,0)
+c=1
+def show(a):
+    global c
+    c=c+1
+    if c%2==0:
+        if a['text']=="":
+            a['text']='0'
+            a['bg']='green'
+            a['fg']='red'
+    
+    else:
+        if a['text']=="":
+        
+            a['text']='x'
+            a['bg']='yellow'
+            a['fg']='black'
+    if(btn1['text']=='0' and btn2['text']=='0' and btn3['text']=='0'):
+        print("player 1 is winner")
+    elif(btn4['text']=='0' and btn5['text']=='0' and btn6['text']=='0'):
+        print("player 1 is winner")
+    elif(btn7['text']=='0' and btn8['text']=='0' and btn9['text']=='0'):
+        print("player 1 is winner")
+    elif(btn1['text']=='0' and btn5['text']=='0' and btn9['text']=='0'):
+        print("player 1 is winner")
+    elif(btn3['text']=='0' and btn5['text']=='0' and btn7['text']=='0'):
+        print("player 1 is winner")
+    elif(btn1['text']=='0' and btn4['text']=='0' and btn7['text']=='0'):
+        print("player 1 is winner")
+    elif(btn2['text']=='0' and btn5['text']=='0' and btn8['text']=='0'):
+        print("player 1 is winner")
+    elif(btn3['text']=='0' and btn6['text']=='0' and btn9['text']=='0'):
+        print("player 1 is winner")
+    elif(btn1['text']=='x' and btn2['text']=='x' and btn3['text']=='x'):
+        print("player 2 is winner")
+    elif(btn4['text']=='x' and btn5['text']=='x' and btn6['text']=='x'):
+        print("player 2 is winner")
+    elif(btn7['text']=='x' and btn8['text']=='x' and btn9['text']=='x'):
+        print("player 2 is winner")    
+    elif(btn1['text']=='x' and btn5['text']=='x' and btn9['text']=='x'):
+        print("player 2 is winner")
+    elif(btn3['text']=='x' and btn5['text']=='x' and btn7['text']=='x'):
+        print("player 2 is winner")
+    elif(btn1['text']=='x' and btn4['text']=='x' and btn7['text']=='x'):
+        print("player 2 is winner")
+    elif(btn2['text']=='x' and btn5['text']=='x' and btn8['text']=='x'):
+        print("player 2 is winner")
+    elif(btn3['text']=='x' and btn6['text']=='x' and btn9['text']=='x'):
+        print("player 2 is winner")
+    
+
+
+
+        
+        
+
+btn1=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn1))
+btn1.grid(row=0,column=0)
+
+btn2=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn2))
+btn2.grid(row=0,column=1)
+
+btn3=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn3))
+btn3.grid(row=0,column=2)
+
+btn4=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn4))
+btn4.grid(row=1,column=0)
+
+btn5=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn5))
+btn5.grid(row=1,column=1)
+
+btn6=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn6))
+btn6.grid(row=1,column=2)
+
+btn7=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn7))
+btn7.grid(row=2,column=0)
+
+btn8=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn8))
+btn8.grid(row=2,column=1)
+
+btn9=Button(root,text='',height=5,width=10,font=('arial',15,'bold'),command=lambda:show(btn9))
+btn9.grid(row=2,column=2)
+
+
+
+root.mainloop()
